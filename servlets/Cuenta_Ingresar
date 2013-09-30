@@ -1,0 +1,65 @@
+package servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import dao.interfaces.CuentaDao;
+import daofactory.DaoFactory;
+
+/**
+ * Servlet implementation class AlertaBilletera_Ingresar
+ */
+@WebServlet("/Cuenta_Ingresar")
+public class Cuenta_Ingresar extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Cuenta_Ingresar() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		PrintWriter out = response.getWriter();
+		try {
+			Integer saldoTotal = Integer.parseInt(request.getParameter("txt_saldoTotal"));
+			
+			DaoFactory variable1 = DaoFactory.getDAOFactory(DaoFactory.MYSQL);
+			CuentaDao variable2 = variable1.getCuentaDao();
+			boolean variable3 = variable2.ingresar(saldoTotal);
+			
+			if(variable3){
+				request.setAttribute("mensaje", "registro satisfactorio");
+			}else{
+				request.setAttribute("mensaje", "ocurrio un error");
+			}
+			
+			getServletContext().getRequestDispatcher("/portada.jsp")
+													.forward(request, response);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			out.print(e.getMessage());
+		}
+	}
+
+}
