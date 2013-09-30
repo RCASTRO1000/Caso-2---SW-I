@@ -1,0 +1,14 @@
+package dao.interfaces;
+
+import beans.UsuarioBean;
+
+public interface UsuarioDao {
+	
+	public UsuarioBean
+	login(String usuario, String password) throws Exception;
+	
+	public boolean registrarUsuario(String nombre, String apellido, String usuario, String contraseña, int cuenta) throws Exception;
+	
+	public UsuarioBean seleccionarUsuario(int codigo) throws Exception;
+	
+}
