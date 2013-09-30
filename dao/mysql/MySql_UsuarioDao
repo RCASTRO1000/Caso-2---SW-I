@@ -1,0 +1,95 @@
+package dao.mysql;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+
+import beans.UsuarioBean;
+
+import dao.interfaces.UsuarioDao;
+import daofactory.MySqlDaoFactory;
+
+public class MySql_UsuarioDao 
+				extends MySqlDaoFactory implements UsuarioDao {
+
+	@Override
+	public UsuarioBean login(String usuario, String password) throws Exception {
+		UsuarioBean usuario1 = null;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = 
+					stmt.executeQuery("select * from t_usuario " +
+					"where usuario='"+usuario+"' and password='"+password+"'");
+			
+			if(rs.next()){
+				usuario1 = new UsuarioBean();
+				usuario1.setIdUsuario(rs.getInt("idUsuario"));
+				usuario1.setNombre(rs.getString("nombre"));
+				usuario1.setApellido(rs.getString("apellido"));
+				usuario1.setNroCuenta(rs.getInt("nrocuenta"));
+				
+			}
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		
+		
+		
+		return usuario1;
+	}
+	
+	@Override
+	public boolean registrarUsuario(String nombre, String apellido,
+			String usuario, String contraseña, int cuenta) throws Exception {
+		boolean flag = false;
+		
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			int i= stmt.executeUpdate("insert into t_usuario (nombre, apellido, usuario, password, nrocuenta)" +
+									"values ('"+nombre+"','"+apellido+"','"+usuario+"','"+contraseña+"','"+cuenta+"')");
+			if(i==1){
+				flag = true;
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.print(e.getMessage());
+		}
+		
+		return flag;
+	}
+
+	@Override
+	public UsuarioBean seleccionarUsuario(int codigo) throws Exception {
+		// TODO Auto-generated method stub
+		UsuarioBean usuario = null;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select * from t_usuario " +
+												"where idUsuario=" + codigo);
+			
+			if(rs.next()){
+				usuario = new UsuarioBean();
+				usuario.setIdUsuario(rs.getInt("idUsuario"));
+				usuario.setNombre(rs.getString("nombre"));
+				usuario.setApellido(rs.getString("apellido"));
+				usuario.setUsuario(rs.getString("usuario"));
+				usuario.setPassword(rs.getString("password"));
+				usuario.setNroCuenta(rs.getInt("nrocuenta"));
+			}
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		
+		return usuario;
+	}
+
+}
