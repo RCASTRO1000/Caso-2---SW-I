@@ -1,0 +1,20 @@
+package beans;
+
+public class CuentaBean {
+	int idCuenta;
+	double saldoTotal;
+	
+	public int getIdCuenta() {
+		return idCuenta;
+	}
+	public void setIdCuenta(int idCuenta) {
+		this.idCuenta = idCuenta;
+	}
+	public double getSaldoTotal() {
+		return saldoTotal;
+	}
+	public void setSaldoTotal(double d) {
+		this.saldoTotal = d;
+	}
+
+}
