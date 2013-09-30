@@ -1,0 +1,179 @@
+package dao.mysql;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Date;
+import java.util.Vector;
+
+import beans.*;
+import dao.interfaces.*;
+import daofactory.MySqlDaoFactory;
+
+public class MySql_RegistroComprasDao
+				extends MySqlDaoFactory implements RegistroComprasDao {
+
+	Date fecha =new Date();
+	
+	@Override
+	public int seleccionaridCuenta() throws Exception {
+		// TODO Auto-generated method stub
+		int idCue = 0;
+		
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("SELECT idCuenta FROM t_cuenta");
+			
+			while(rs.next()){
+				
+				idCue = ((rs.getInt("idCuenta")));
+	
+			}			
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		return idCue;
+	}
+
+	@Override
+	public boolean registro(double cantidad, double precio, String rubro)
+			throws Exception {
+		boolean flag = false;
+		
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			CuentaDao usu =getCuentaDao();
+			int usu1 = usu.seleccionaridUsuario();
+			
+			int i= stmt.executeUpdate("insert into t_registrocompras (cantidad, precio, rubro, gasto, porcentaje, idCuenta) " +
+					"values ('"+cantidad+"','"+precio+"','"+rubro+"','"+(cantidad*precio)+"','"+(cantidad*precio)+"','"+(seleccionaridCuenta())+"')");
+			
+			String descrip="Se hizo un gasto en "+rubro+" por un precio de "+(cantidad*precio)+" Soles";
+			
+			stmt.executeUpdate("insert into t_auditoria (descripcion, fecha, idUsuario)" +
+					"values ('"+descrip+"','"+(obtenerFecha())+"','"+usu1+"')");
+			
+			if(i==1){
+				flag = true;
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.print(e.getMessage());
+		}
+		
+		return flag;
+	}
+	
+	@Override
+	public String obtenerFecha() throws Exception {
+		
+		String fecha1="";
+		
+		int dia = fecha.getDate();
+		int mes=fecha.getMonth()+1;
+		int anio=fecha.getYear()+1900;
+		
+		fecha1 = "Se registro en la fecha: "+dia+"/"+mes+"/"+anio+" Hora: "+fecha.getHours()+":"+fecha.getMinutes()+":"+fecha.getSeconds();
+				
+		return fecha1;
+	}
+
+	@Override
+	public Vector<RegistroComprasBean> reporte() throws Exception {
+		Vector<RegistroComprasBean> billetera = null;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select cantidad, precio, rubro from t_registrocompras");
+			
+			billetera = new Vector<RegistroComprasBean>();
+			while(rs.next()){
+				RegistroComprasBean bean = new RegistroComprasBean();
+				bean.setRubro(rs.getString("rubro"));
+				bean.setGasto((rs.getDouble("cantidad")*rs.getDouble("Precio")));
+				
+				billetera.add( bean );
+			}
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		return billetera;
+		}
+
+	@Override
+	public double seleccionarGasto() throws Exception {
+		double gasto = 0;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select gasto from t_registrocompras");
+			
+			while(rs.next()){
+				gasto = (gasto+(rs.getDouble("gasto")));
+			}
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		return gasto;
+	}
+
+	@Override
+	public boolean eliminarGasto() throws Exception {
+			boolean flag = false;
+			
+			try {
+				Connection con = MySqlDaoFactory.obtenerConexion();
+				Statement stmt = con.createStatement();
+				
+				int i = stmt.executeUpdate("delete from t_registrocompras");
+				
+				if(i==1){
+					flag = true;
+				}
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.print(e.getMessage());
+			}
+			
+			return flag;
+	}
+
+	@Override
+	public Vector<RegistroComprasBean> reportePorcentaje() {
+		Vector<RegistroComprasBean> billetera = null;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select cantidad, precio, rubro, saldoTotal from t_registrocompras, t_cuenta");
+			
+			billetera = new Vector<RegistroComprasBean>();
+			while(rs.next()){
+				RegistroComprasBean bean = new RegistroComprasBean();
+				bean.setRubro(rs.getString("rubro"));
+				bean.setPorcentaje(((rs.getDouble("cantidad")*rs.getDouble("Precio"))*100)/(rs.getDouble("saldoTotal")));
+				
+				billetera.add( bean );
+			}
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		return billetera;
+		}
+	
+	
+
+}
