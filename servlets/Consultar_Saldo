@@ -1,0 +1,73 @@
+package servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import dao.interfaces.CuentaDao;
+import dao.interfaces.RegistroComprasDao;
+import daofactory.DaoFactory;
+
+/**
+ * Servlet implementation class Consultar_Saldo
+ */
+@WebServlet("/Consultar_Saldo")
+public class Consultar_Saldo extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Consultar_Saldo() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		PrintWriter out = response.getWriter();
+		
+		try {
+			DaoFactory variable1 = DaoFactory.getDAOFactory(DaoFactory.MYSQL);
+			RegistroComprasDao variable2 = variable1.getRegistroComprasDao();
+			CuentaDao saldo2 = variable1.getCuentaDao();
+			double gasto3 = variable2.seleccionarGasto();			
+			double saldo3 = saldo2.seleccionarSaldoTotal();
+			
+			double total=0;
+			double totalpor=0;
+			total = saldo3-gasto3;
+			totalpor =(100-gasto3*100/saldo3);
+			int totalpor1 = (int) Math.round(totalpor*100);
+	        double totalpor2 = totalpor1 / 100.0;
+			if(saldo3==0){
+				totalpor2 = 0;
+			}
+			request.setAttribute("saldo", "Su Saldo es S/."+total+"\n\n Equivale el: "+totalpor2+" %");
+			
+			getServletContext().getRequestDispatcher("/saldo.jsp")
+				.forward(request, response);
+
+} catch (Exception e) {
+// TODO: handle exception
+out.print(e.getMessage());
+
+}
+}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+}
