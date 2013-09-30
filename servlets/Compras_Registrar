@@ -1,0 +1,81 @@
+package servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import dao.interfaces.CuentaDao;
+import dao.interfaces.RegistroComprasDao;
+import daofactory.DaoFactory;
+
+/**
+ * Servlet implementation class AlertaBilletera_Registrar
+ */
+@WebServlet("/Compras_Registrar")
+public class Compras_Registrar extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Compras_Registrar() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		PrintWriter out = response.getWriter();
+		
+		try {
+			Double cantidad = Double.parseDouble(request.getParameter("txt_cantidad"));
+			Double precio = Double.parseDouble(request.getParameter("txt_precio"));
+			String rubro = request.getParameter("txt_rubro");
+			
+			DaoFactory variable1 = DaoFactory.getDAOFactory(DaoFactory.MYSQL);
+			RegistroComprasDao variable2 = variable1.getRegistroComprasDao();
+			CuentaDao saldo2 = variable1.getCuentaDao();
+			variable2.registro(cantidad, precio, rubro);
+			double gasto3 = variable2.seleccionarGasto();			
+			double saldo3 = saldo2.seleccionarSaldoTotal();
+			
+			double total=0;
+			total= saldo3-gasto3;
+			
+			if(saldo3>=gasto3){
+			
+			if((total)<=(saldo3*0.20)){
+					request.setAttribute("mensaje", "El saldo total es de :S/. "+total+ ", está en el 20% o por debajo de él");
+			
+			}else{
+				request.setAttribute("mensaje", "Su monto total es de : S/"+total);
+			}}else{
+				request.setAttribute("mensaje", "No tiene Saldo Suficiente, Ingrese Nueva Cantidad Disponible");
+			}
+
+				getServletContext().getRequestDispatcher("/mensaje.jsp")
+				.forward(request, response);
+					
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			out.print(e.getMessage());
+		}
+	}
+
+}
