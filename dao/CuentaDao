@@ -1,0 +1,15 @@
+package dao.interfaces;
+
+public interface CuentaDao {
+	
+	public int seleccionaridUsuario() throws Exception;
+	
+	public boolean ingresar(double saldoTotal) throws Exception;
+	
+	public double seleccionarSaldoTotal() throws Exception;
+	
+	public String obtenerFecha() throws Exception;
+	
+	public boolean eliminarSaldo() throws Exception;
+
+}
