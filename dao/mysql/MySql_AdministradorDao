@@ -1,0 +1,142 @@
+package dao.mysql;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Vector;
+
+import beans.AdministradorBean;
+import beans.UsuarioBean;
+import dao.interfaces.AdministradorDao;
+import daofactory.MySqlDaoFactory;
+
+public class MySql_AdministradorDao 
+				extends MySqlDaoFactory implements AdministradorDao{
+
+	@Override
+	public boolean crearUsuario(String nombre, String apellido, String usuario,
+			String contraseña, int cuenta) throws Exception {
+		boolean flag = false;
+		
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			int i= stmt.executeUpdate("insert into t_usuario (nombre, apellido, usuario, password, nrocuenta)" +
+									"values ('"+nombre+"','"+apellido+"','"+usuario+"','"+contraseña+"','"+cuenta+"')");
+			if(i==1){
+				flag = true;
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.print(e.getMessage());
+		}
+		
+		return flag;
+	}
+
+	@Override
+	public Vector<UsuarioBean> mostrarUsuarios() throws Exception {
+		Vector<UsuarioBean> usuario = null;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select * from t_usuario");
+			
+			usuario = new Vector<UsuarioBean>();
+			while(rs.next()){
+				UsuarioBean bean = new UsuarioBean();
+				bean.setIdUsuario(rs.getInt("idUsuario"));
+				bean.setNombre(rs.getString("nombre"));
+				bean.setApellido(rs.getString("apellido"));
+				bean.setUsuario(rs.getString("usuario"));
+				bean.setPassword(rs.getString("password"));
+				bean.setNroCuenta(rs.getInt("nrocuenta"));
+				
+				usuario.add( bean );
+			}
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		return usuario;
+		}
+
+	@Override
+	public boolean eliminarUsuario(int id) throws Exception {
+		boolean flag = false;
+		
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			int i = stmt.executeUpdate("delete from t_usuario where idUsuario='"+id+"'"); 
+			
+			if(i==1){
+				flag = true;
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.print(e.getMessage());
+		}
+		
+		return flag;
+}
+
+	@Override
+	public boolean editarUsuario(UsuarioBean usuario) throws Exception {
+		// TODO Auto-generated method stub
+		boolean flag = false;
+		
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			int i= stmt.executeUpdate("update t_usuario " +
+					"set nombre = '" + usuario.getNombre() + "'" +
+							" , apellido = '" + usuario.getApellido() + "'" +
+									" , usuario = '" + usuario.getUsuario() + "'" +
+											" , password = '" + usuario.getPassword() + "'" +
+													" , nrocuenta = '" + usuario.getNroCuenta() + "'" +
+															" where idUsuario=" + usuario.getIdUsuario());
+			if(i==1){
+				flag = true;
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.print(e.getMessage());
+		}
+		
+		return flag;
+	}
+	@Override
+	public AdministradorBean login(String administrador, String password)
+			throws Exception {
+		AdministradorBean administrador1 = null;
+		try {
+			Connection con = MySqlDaoFactory.obtenerConexion();
+			Statement stmt = con.createStatement();
+			
+			ResultSet rs = 
+					stmt.executeQuery("select * from t_administrador " +
+					"where administrador='"+administrador+"' and password='"+password+"'");
+			
+			if(rs.next()){
+				administrador1 = new AdministradorBean();
+				administrador1.setIdAdministrador(rs.getInt("idAdministrador"));
+				administrador1.setNombre(rs.getString("nombre"));
+				administrador1.setApellido(rs.getString("apellido"));
+				
+			}
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+		
+		return administrador1;
+	}
+
+}
