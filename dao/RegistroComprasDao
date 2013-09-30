@@ -1,0 +1,23 @@
+package dao.interfaces;
+
+import java.util.Vector;
+
+import beans.RegistroComprasBean;
+
+public interface RegistroComprasDao {
+	
+	public int seleccionaridCuenta() throws Exception;
+
+	public boolean registro(double cantidad, double precio, String rubro) throws Exception;
+	
+	public Vector<RegistroComprasBean> reporte() throws Exception;
+	
+	public double seleccionarGasto() throws Exception;
+	
+	public boolean eliminarGasto() throws Exception;
+	
+	public String obtenerFecha() throws Exception;
+	
+	public Vector<RegistroComprasBean> reportePorcentaje();
+			
+}
